@@ -1,0 +1,200 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,300;1,9..40,400&family=Syne:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* ── Pink safety palette ─────────────────────────────────── */
+  --color-bg-root:    #08030a;
+  --color-bg-base:    #0d0510;
+  --color-bg-card:    #130a18;
+  --color-bg-surface: #1a0e22;
+  --color-bg-raised:  #221529;
+
+  /* ── Primary pink ────────────────────────────────────────── */
+  --color-pink:       #f0197d;
+  --color-pink-light: #ff5fad;
+  --color-pink-pale:  #fda7d0;
+  --color-pink-dim:   #2a0819;
+  --color-pink-glow:  rgba(240,25,125,0.18);
+
+  /* ── Rose (softer) ───────────────────────────────────────── */
+  --color-rose:       #fb7db4;
+  --color-rose-dim:   #200c18;
+
+  /* ── SOS / danger — bright alarm red ────────────────────── */
+  --color-sos:        #ff1744;
+  --color-sos-dim:    #2b0008;
+  --color-sos-glow:   rgba(255,23,68,0.2);
+
+  /* ── Safe green ──────────────────────────────────────────── */
+  --color-safe:       #39e09b;
+  --color-safe-dim:   #04200f;
+
+  /* ── Text ────────────────────────────────────────────────── */
+  --color-text-hi:    #fff0f6;
+  --color-text-md:    #c8a0b8;
+  --color-text-lo:    #7a546c;
+
+  /* ── Borders ─────────────────────────────────────────────── */
+  --color-stroke:     #1e0e24;
+  --color-stroke-hi:  #2e1638;
+
+  /* ── Fonts ───────────────────────────────────────────────── */
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-display: 'Syne', system-ui, sans-serif;
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html  { color-scheme: dark; scroll-behavior: smooth; }
+body  {
+  font-family: var(--font-body);
+  background: var(--color-bg-root);
+  color: var(--color-text-hi);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  overflow-x: hidden;
+}
+
+/* ── Display headings ────────────────────────────────────── */
+h1,h2,h3,h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+/* ── Global focus ────────────────────────────────────────── */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-pink);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Noise grain overlay
+═══════════════════════════════════════════════════════════ */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:999;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Glow orbs
+═══════════════════════════════════════════════════════════ */
+.orb {
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  filter:blur(80px);
+}
+.orb-pink {
+  width:640px; height:640px;
+  background:radial-gradient(circle, rgba(240,25,125,0.13) 0%, transparent 65%);
+}
+.orb-rose {
+  width:480px; height:480px;
+  background:radial-gradient(circle, rgba(251,125,180,0.08) 0%, transparent 65%);
+}
+.orb-sos {
+  width:360px; height:360px;
+  background:radial-gradient(circle, rgba(255,23,68,0.09) 0%, transparent 65%);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Dot-grid background
+═══════════════════════════════════════════════════════════ */
+.dot-grid {
+  background-image: radial-gradient(circle, var(--color-stroke-hi) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Glassmorphism card
+═══════════════════════════════════════════════════════════ */
+.glass {
+  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(240,25,125,0.02) 100%);
+  border: 1px solid var(--color-stroke-hi);
+  backdrop-filter: blur(12px);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Animations
+═══════════════════════════════════════════════════════════ */
+@keyframes rise {
+  from { opacity:0; transform:translateY(24px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes drift-in {
+  from { opacity:0; transform:translateX(-20px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+@keyframes sos-ring {
+  0%,100% { box-shadow:0 0 0 0 var(--color-sos-glow); }
+  55%     { box-shadow:0 0 0 20px transparent; }
+}
+@keyframes pink-ring {
+  0%,100% { box-shadow:0 0 0 0 var(--color-pink-glow); }
+  55%     { box-shadow:0 0 0 16px transparent; }
+}
+@keyframes breathe {
+  0%,100% { opacity:0.6; transform:scale(1); }
+  50%     { opacity:1;   transform:scale(1.08); }
+}
+@keyframes shimmer-sweep {
+  0%   { background-position:200% center; }
+  100% { background-position:-200% center; }
+}
+@keyframes ticker {
+  0%   { transform:translateY(0); }
+  100% { transform:translateY(-50%); }
+}
+
+.rise          { animation: rise       0.55s cubic-bezier(0.22,1,0.36,1) both; }
+.drift-in      { animation: drift-in   0.45s cubic-bezier(0.22,1,0.36,1) both; }
+.sos-pulse     { animation: sos-ring   2.2s ease-in-out infinite; }
+.pink-pulse    { animation: pink-ring  2.5s ease-in-out infinite; }
+.breathe-anim  { animation: breathe    3s   ease-in-out infinite; }
+.ticker-anim   { animation: ticker     18s  linear infinite; }
+
+.d1 { animation-delay:0.08s; }
+.d2 { animation-delay:0.16s; }
+.d3 { animation-delay:0.24s; }
+.d4 { animation-delay:0.32s; }
+.d5 { animation-delay:0.40s; }
+
+/* ═══════════════════════════════════════════════════════════
+   Pink shimmer text
+═══════════════════════════════════════════════════════════ */
+.shimmer-text {
+  background: linear-gradient(90deg,
+    var(--color-pink-pale) 0%,
+    var(--color-pink) 30%,
+    var(--color-rose)     60%,
+    var(--color-pink-pale) 100%);
+  background-size:200% auto;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation: shimmer-sweep 4s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Live dot
+═══════════════════════════════════════════════════════════ */
+.live-dot {
+  width:7px; height:7px;
+  border-radius:50%;
+  background:var(--color-safe);
+  animation:breathe 2.5s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Scrollbar
+═══════════════════════════════════════════════════════════ */
+::-webkit-scrollbar             { width:6px; }
+::-webkit-scrollbar-track       { background:var(--color-bg-root); }
+::-webkit-scrollbar-thumb       { background:var(--color-stroke-hi); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--color-pink-dim); }
