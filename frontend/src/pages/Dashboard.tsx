@@ -22,6 +22,12 @@ import ProtectPanel from '../features/protect/ProtectPanel';
 import RespondPanel from '../features/respond/RespondPanel';
 import Home from './Home';
 
+// Guardian Mode imports
+import { useGuardianStore } from '../store/guardianStore';
+import { useMotionSensor } from '../hooks/useMotionSensor';
+import { useMicListener } from '../hooks/useMicListener';
+import DistressPrompt from '../features/protect/DistressPrompt';
+
 type Tab = 'home' | 'predict' | 'protect' | 'respond';
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; accent: string }[] = [
@@ -43,6 +49,7 @@ export default function Dashboard() {
   const [tab, setTab]     = useState<Tab>(getTabFromHash);
   const [sideOpen, setSideOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { active: guardianActive, stopGuardian } = useGuardianStore();
 
   // Re-read tab when hash changes (from quick-action navigation)
   useEffect(() => {
@@ -199,6 +206,56 @@ export default function Dashboard() {
           </span>
         </div>
 
+        {/* Guardian Mode Active Banner */}
+        {guardianActive && (
+          <div style={{
+            background: 'linear-gradient(90deg, rgba(57, 224, 155, 0.12) 0%, rgba(13, 5, 16, 0.95) 100%)',
+            borderBottom: '1px solid rgba(57, 224, 155, 0.25)',
+            padding: '10px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            animation: 'banner-slide 0.3s ease-out',
+            zIndex: 9,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+              <div style={{
+                width: '8px', height: '8px', borderRadius: '50%',
+                background: 'var(--color-safe)',
+                boxShadow: '0 0 10px var(--color-safe)',
+                animation: 'guardian-blink 1.5s infinite',
+                flexShrink: 0,
+              }} />
+              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--color-safe)', letterSpacing: '-0.01em', whiteSpace: 'nowrap' }}>
+                Guardian Mode Active
+              </span>
+              <span style={{ fontSize: '11px', color: 'var(--color-text-lo)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                • Screen must stay unlocked & tab open to monitor
+              </span>
+            </div>
+            <button
+              onClick={stopGuardian}
+              style={{
+                background: 'rgba(255, 23, 68, 0.1)',
+                border: '1px solid rgba(255, 23, 68, 0.25)',
+                borderRadius: '6px',
+                color: 'var(--color-sos)',
+                fontSize: '10px',
+                padding: '3.5px 8px',
+                cursor: 'pointer',
+                fontWeight: 600,
+                transition: 'all 0.2s',
+                flexShrink: 0,
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--color-sos)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255, 23, 68, 0.1)'; e.currentTarget.style.color = 'var(--color-sos)'; }}
+            >
+              Stop
+            </button>
+          </div>
+        )}
+
         {/* Panel content */}
         <div style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
           {tab === 'home'    && <Home />}
@@ -213,6 +270,51 @@ export default function Dashboard() {
 
       {/* Full-screen SOS overlay */}
       <SOSActiveScreen />
+
+      {/* Guardian Mode background listeners */}
+      <GuardianListener />
+
+      {/* Full-screen "Are you safe?" distress warning */}
+      <DistressPrompt />
+
+      {/* Keyframe animations for banner & indicator */}
+      <style>{`
+        @keyframes banner-slide {
+          from { transform: translateY(-100%); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes guardian-blink {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 1; }
+        }
+      `}</style>
     </div>
   );
+}
+
+/**
+ * Background listener that mounts useMotionSensor and useMicListener
+ * hooks in the main Dashboard shell context, allowing continuous monitoring
+ * regardless of the active tab.
+ */
+function GuardianListener() {
+  const { active, sensitivity, isPromptOpen, triggerDistress, resolveSafe, setAudioLevel } = useGuardianStore();
+
+  useMotionSensor({
+    active,
+    sensitivity,
+    onTrigger: () => triggerDistress('motion'),
+  });
+
+  useMicListener({
+    active,
+    isPromptOpen,
+    sensitivity,
+    onVolumeTrigger: () => triggerDistress('audio'),
+    onSpeechTrigger: () => triggerDistress('speech'),
+    onSafeSpeechDetected: resolveSafe,
+    onAudioLevelChange: setAudioLevel,
+  });
+
+  return null;
 }

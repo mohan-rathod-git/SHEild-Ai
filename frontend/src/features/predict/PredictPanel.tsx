@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { MapPin, Search, ArrowRight, AlertTriangle, CheckCircle2, AlertCircle } from 'lucide-react';
+import { MapPin, Search, AlertTriangle, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../auth/useAuth';
 
 interface ScoredWaypoint {
@@ -218,7 +218,7 @@ export default function PredictPanel() {
             </p>
             <svg viewBox="0 0 400 80" style={{ width: '100%', overflow: 'visible' }}>
               {/* Route line */}
-              {result.waypoints.map((wp, i) => {
+              {result.waypoints.map((_wp, i) => {
                 if (i === 0) return null;
                 const prev = result.waypoints[i - 1];
                 const x1 = (i - 1) * (400 / (result.waypoints.length - 1));

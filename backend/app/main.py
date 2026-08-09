@@ -53,8 +53,11 @@ from app.api.v1.routes_respond import router as respond_router
 from app.api.v1.routes_auth import router as auth_router
 from app.api.v1.routes_contacts import router as contacts_router
 from app.api.v1.routes_predict import router as predict_router
+from app.api.v1.routes_protect import router as protect_router
 
 app.include_router(respond_router, prefix="/api/v1")
 app.include_router(auth_router,    prefix="/api/v1")
 app.include_router(contacts_router, prefix="/api/v1")
 app.include_router(predict_router,  prefix="/api/v1")
+app.include_router(protect_router,  prefix="/api/v1")
+

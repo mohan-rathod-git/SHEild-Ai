@@ -15,7 +15,7 @@
 import { useEffect, useState } from 'react';
 import {
   Navigation2, ShieldCheck, Siren, Users, CheckCircle2,
-  AlertTriangle, Clock, Loader2,
+  Clock, Loader2,
 } from 'lucide-react';
 import { useAuth } from '../../features/auth/useAuth';
 

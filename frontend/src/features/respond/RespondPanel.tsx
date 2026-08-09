@@ -6,7 +6,7 @@
  * by SOSActiveScreen (always mounted in Dashboard).
  */
 
-import { Siren, Users, Phone, ShieldAlert, Info } from 'lucide-react';
+import { Siren, Info } from 'lucide-react';
 import { useSOSStore } from '../../store/sosStore';
 
 const CASCADE_STEPS = [

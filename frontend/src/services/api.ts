@@ -92,6 +92,34 @@ export const backendApi = {
   },
 
   /**
+   * Log the start of a Guardian Mode session on the backend.
+   */
+  async startGuardianSession(
+    payload: { sensitivity: string; mic_enabled: boolean; motion_enabled: boolean; speech_enabled: boolean },
+    token: string,
+  ): Promise<{ session_id: string; status: string; started_at: string }> {
+    return apiFetch<{ session_id: string; status: string; started_at: string }>(
+      '/api/v1/protect/session/start',
+      { method: 'POST', body: JSON.stringify(payload) },
+      token,
+    );
+  },
+
+  /**
+   * Log the end of a Guardian Mode session on the backend.
+   */
+  async stopGuardianSession(
+    payload: { session_id: string; distress_count: number; false_alarm_count: number; duration_seconds?: number | null },
+    token: string,
+  ): Promise<{ session_id: string; status: string; stopped_at: string }> {
+    return apiFetch<{ session_id: string; status: string; stopped_at: string }>(
+      '/api/v1/protect/session/stop',
+      { method: 'POST', body: JSON.stringify(payload) },
+      token,
+    );
+  },
+
+  /**
    * Batch-sync offline-queued SOS events once connectivity returns.
    */
   async syncOfflineEvents(
