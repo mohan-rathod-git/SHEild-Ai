@@ -14,6 +14,7 @@ import { useAuth, initAuthListener } from './features/auth/useAuth';
 import AuthPage from './features/auth/AuthPage';
 import Dashboard from './pages/Dashboard';
 import LandingPage from './pages/LandingPage';
+import JourneyPage from './pages/JourneyPage';
 
 // ── Hash router ───────────────────────────────────────────────
 function getRoute(): string {
@@ -42,9 +43,9 @@ function Router() {
     }
   }, [user, loading, route]);
 
-  // Redirect unauthenticated users away from /app
+  // Redirect unauthenticated users away from /app and /journey
   useEffect(() => {
-    if (!loading && !user && route === '/app') {
+    if (!loading && !user && (route === '/app' || route.startsWith('/app?') || route === '/journey')) {
       navigate('/login');
     }
   }, [user, loading, route]);
@@ -68,8 +69,9 @@ function Router() {
     );
   }
 
-  if (route === '/app') return <Dashboard />;
-  if (route === '/login') return <AuthPage />;
+  if (route === '/app' || route.startsWith('/app?')) return <Dashboard />;
+  if (route === '/login')   return <AuthPage />;
+  if (route === '/journey') return <JourneyPage />;
   return <LandingPage onGetStarted={() => navigate(user ? '/app' : '/login')} />;
 }
 

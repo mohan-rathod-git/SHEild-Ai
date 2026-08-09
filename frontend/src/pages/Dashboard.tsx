@@ -9,10 +9,10 @@
  *   • User profile + sign-out in sidebar footer
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Shield, MapPin, Mic2, Siren, LogOut, Menu, X,
-  User, ChevronRight
+  User, ChevronRight, Home as HomeIcon,
 } from 'lucide-react';
 import { useAuth } from '../features/auth/useAuth';
 import SOSButton from '../features/respond/SOSButton';
@@ -20,19 +20,36 @@ import SOSActiveScreen from '../features/respond/SOSActiveScreen';
 import PredictPanel from '../features/predict/PredictPanel';
 import ProtectPanel from '../features/protect/ProtectPanel';
 import RespondPanel from '../features/respond/RespondPanel';
+import Home from './Home';
 
-type Tab = 'predict' | 'protect' | 'respond';
+type Tab = 'home' | 'predict' | 'protect' | 'respond';
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode; accent: string }[] = [
-  { id: 'predict', label: 'Predict',  icon: <MapPin  size={17} />, accent: 'var(--color-pink)' },
-  { id: 'protect', label: 'Protect',  icon: <Mic2    size={17} />, accent: 'var(--color-rose)' },
-  { id: 'respond', label: 'Respond',  icon: <Siren   size={17} />, accent: 'var(--color-sos)'  },
+  { id: 'home',    label: 'Home',    icon: <HomeIcon size={17} />, accent: 'var(--color-pink)' },
+  { id: 'predict', label: 'Predict', icon: <MapPin  size={17} />, accent: '#818cf8' },
+  { id: 'protect', label: 'Protect', icon: <Mic2    size={17} />, accent: 'var(--color-safe)' },
+  { id: 'respond', label: 'Respond', icon: <Siren   size={17} />, accent: 'var(--color-sos)'  },
 ];
 
+/** Parse ?tab=xxx from the current hash, e.g. #/app?tab=protect */
+function getTabFromHash(): Tab {
+  const hash = window.location.hash;
+  const match = hash.match(/[?&]tab=([a-z]+)/);
+  const t = match?.[1] as Tab | undefined;
+  return TABS.some(x => x.id === t) ? t! : 'home';
+}
+
 export default function Dashboard() {
-  const [tab, setTab]     = useState<Tab>('predict');
+  const [tab, setTab]     = useState<Tab>(getTabFromHash);
   const [sideOpen, setSideOpen] = useState(false);
   const { user, signOut } = useAuth();
+
+  // Re-read tab when hash changes (from quick-action navigation)
+  useEffect(() => {
+    const handler = () => setTab(getTabFromHash());
+    window.addEventListener('hashchange', handler);
+    return () => window.removeEventListener('hashchange', handler);
+  }, []);
 
   const displayName = (user?.user_metadata?.display_name as string | undefined)
     ?? user?.email?.split('@')[0]
@@ -184,6 +201,7 @@ export default function Dashboard() {
 
         {/* Panel content */}
         <div style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
+          {tab === 'home'    && <Home />}
           {tab === 'predict' && <PredictPanel />}
           {tab === 'protect' && <ProtectPanel />}
           {tab === 'respond' && <RespondPanel />}
